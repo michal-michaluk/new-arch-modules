@@ -1,14 +1,12 @@
 package services.impl;
 
-import dao.DemandDao;
-import dao.ProductionDao;
-import entities.DemandEntity;
-import entities.ProductionEntity;
 import entities.ShortageEntity;
 import external.CurrentStock;
 import shortages.Demands;
 import shortages.Demands.DailyDemand;
+import shortages.DemandsRepository;
 import shortages.ProductionOutputs;
+import shortages.ProductionOutputsRepository;
 
 import java.time.LocalDate;
 import java.util.LinkedList;
@@ -17,12 +15,12 @@ import java.util.stream.Stream;
 
 public class ShortageFinder {
 
-    private final DemandDao demandDao;
-    private final ProductionDao productionDao;
+    private final ProductionOutputsRepository prouctions;
+    private final DemandsRepository demands;
 
-    public ShortageFinder(DemandDao demandDao, ProductionDao productionDao) {
-        this.demandDao = demandDao;
-        this.productionDao = productionDao;
+    public ShortageFinder(ProductionOutputsRepository prouctions, DemandsRepository demands) {
+        this.prouctions = prouctions;
+        this.demands = demands;
     }
 
     /**
@@ -44,15 +42,12 @@ public class ShortageFinder {
      * (increase amount in scheduled transport or organize extra transport at given time)
      */
     public List<ShortageEntity> findShortages(String productRefNo, LocalDate today, int daysAhead, CurrentStock stock) {
-        List<ProductionEntity> productions = productionDao.findFromTime(productRefNo, today.atStartOfDay());
-        List<DemandEntity> demands = demandDao.findFrom(today.atStartOfDay(), productRefNo);
+        ProductionOutputs outputs = prouctions.getOutputs(productRefNo, today);
+        Demands demandsPerDay = demands.getDemands(productRefNo, today);
 
         List<LocalDate> dates = Stream.iterate(today, date -> date.plusDays(1))
                 .limit(daysAhead)
                 .toList();
-
-        var outputs = new ProductionOutputs(productions);
-        var demandsPerDay = new Demands(demands);
 
         long level = stock.getLevel();
 
@@ -80,4 +75,5 @@ public class ShortageFinder {
         }
         return gap;
     }
+
 }
