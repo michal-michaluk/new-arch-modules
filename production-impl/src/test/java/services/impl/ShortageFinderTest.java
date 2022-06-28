@@ -4,12 +4,14 @@ import acl.DemandsMediator;
 import acl.ProductionOutputsMediator;
 import dao.DemandDao;
 import dao.ProductionDao;
+import demands.DemandModuleFacade;
 import entities.*;
 import enums.DeliverySchema;
 import external.CurrentStock;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
+import shortages.ShortageFinder;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -29,7 +31,14 @@ public class ShortageFinderTest {
 
     private final DemandDao demands = Mockito.mock(DemandDao.class);
     private final ProductionDao productions = Mockito.mock(ProductionDao.class);
-    private final ShortageFinder subject = new ShortageFinder(new ProductionOutputsMediator(productions), new DemandsMediator(demands));
+    private final ShortageFinder subject = createShortageFinder();
+
+    private ShortageFinder createShortageFinder() {
+        return new ShortageFinder(
+                new ProductionOutputsMediator(productions),
+                new DemandsMediator(new DemandModuleFacade(demands))
+        );
+    }
 
     @Test
     public void findShortages() {

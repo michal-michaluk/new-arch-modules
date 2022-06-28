@@ -14,6 +14,7 @@ import external.CurrentStock;
 import external.JiraService;
 import external.NotificationsService;
 import external.StockService;
+import shortages.ShortageFinder;
 import tools.Util;
 
 import java.time.Clock;

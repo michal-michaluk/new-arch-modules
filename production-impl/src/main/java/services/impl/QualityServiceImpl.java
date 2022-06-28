@@ -8,6 +8,7 @@ import external.CurrentStock;
 import external.JiraService;
 import external.NotificationsService;
 import external.StockService;
+import shortages.ShortageFinder;
 
 import java.time.Clock;
 import java.time.LocalDate;

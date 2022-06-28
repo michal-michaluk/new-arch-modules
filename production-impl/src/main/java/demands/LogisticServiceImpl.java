@@ -1,4 +1,4 @@
-package services.impl;
+package demands;
 
 import api.AdjustDemandDto;
 import api.LogisticService;
@@ -12,6 +12,7 @@ import external.CurrentStock;
 import external.JiraService;
 import external.NotificationsService;
 import external.StockService;
+import shortages.ShortageFinder;
 
 import java.time.Clock;
 import java.time.LocalDate;

@@ -1,12 +1,8 @@
-package services.impl;
+package shortages;
 
 import entities.ShortageEntity;
 import external.CurrentStock;
-import shortages.Demands;
 import shortages.Demands.DailyDemand;
-import shortages.DemandsRepository;
-import shortages.ProductionOutputs;
-import shortages.ProductionOutputsRepository;
 
 import java.time.LocalDate;
 import java.util.LinkedList;

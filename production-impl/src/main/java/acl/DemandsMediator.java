@@ -1,31 +1,29 @@
 package acl;
 
-import dao.DemandDao;
-import entities.DemandEntity;
+import demands.DemandModuleFacade;
 import shortages.Demands;
 import shortages.DemandsRepository;
-import tools.Util;
 
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 public class DemandsMediator implements DemandsRepository {
 
-    private final DemandDao demandDao;
+    private final DemandModuleFacade facade;
 
-    public DemandsMediator(DemandDao demandDao) {
-        this.demandDao = demandDao;
+    public DemandsMediator(DemandModuleFacade facade) {
+        this.facade = facade;
     }
 
     @Override
     public Demands getDemands(String productRefNo, LocalDate today) {
         return new Demands(
-                demandDao.findFrom(today.atStartOfDay(), productRefNo).stream()
+                facade.findFrom(productRefNo, today).stream()
                         .collect(Collectors.toUnmodifiableMap(
-                                DemandEntity::getDay,
+                                DemandModuleFacade.DemandRecord::date,
                                 demand -> new Demands.DailyDemand(
-                                        Util.getLevel(demand),
-                                        Util.getDeliverySchema(demand)
+                                        demand.demand(),
+                                        demand.schema()
                                 )
                         )));
     }
