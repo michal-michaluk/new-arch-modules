@@ -6,7 +6,7 @@ import shortages.ProductionOutputs;
 import shortages.ProductionOutputsRepository;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.stream.Collectors;
 
 public class ProductionOutputsMediator implements ProductionOutputsRepository {
     private final ProductionDao productionDao;
@@ -17,8 +17,11 @@ public class ProductionOutputsMediator implements ProductionOutputsRepository {
 
     @Override
     public ProductionOutputs getOutputs(String productRefNo, LocalDate today) {
-        List<ProductionEntity> productions = productionDao.findFromTime(productRefNo, today.atStartOfDay());
-        var outputs = new ProductionOutputs(productions);
-        return outputs;
+        return new ProductionOutputs(
+                productionDao.findFromTime(productRefNo, today.atStartOfDay())
+                        .stream().collect(Collectors.groupingBy(
+                                production -> production.getStart().toLocalDate(),
+                                Collectors.summingLong(ProductionEntity::getOutput)
+                        )));
     }
 }

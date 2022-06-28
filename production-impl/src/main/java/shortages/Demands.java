@@ -1,50 +1,39 @@
 package shortages;
 
-import entities.DemandEntity;
 import enums.DeliverySchema;
-import tools.Util;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Demands {
 
-    private final Map<LocalDate, DemandEntity> demandsPerDay = new HashMap<>();
+    private final Map<LocalDate, DailyDemand> demands;
 
-    public Demands(List<DemandEntity> demands) {
-        for (DemandEntity demand : demands) {
-            demandsPerDay.put(demand.getDay(), demand);
-        }
+    public Demands(Map<LocalDate, DailyDemand> demands) {
+        this.demands = demands;
     }
 
     public DailyDemand get(LocalDate day) {
-        if (demandsPerDay.containsKey(day)) {
-            return new DailyDemand(demandsPerDay.get(day));
-        }
-        return null;
+        return demands.getOrDefault(day, null);
     }
 
     public static class DailyDemand {
 
-        private final DemandEntity demand;
+        private final long demand;
+        private final DeliverySchema schema;
 
-        public DailyDemand(DemandEntity demand) {
+        public DailyDemand(long demand, DeliverySchema schema) {
             this.demand = demand;
-        }
-
-        public long getLevel() {
-            return Util.getLevel(demand);
+            this.schema = schema;
         }
 
         public long calculateLevelOnDelivery(long level, long produced) {
             long levelOnDelivery;
-            if (hasDeliverySchema(DeliverySchema.atDayStart)) {
-                levelOnDelivery = level - getLevel();
-            } else if (hasDeliverySchema(DeliverySchema.tillEndOfDay)) {
-                levelOnDelivery = level - getLevel() + produced;
-            } else if (hasDeliverySchema(DeliverySchema.every3hours)) {
+            if (schema == DeliverySchema.atDayStart) {
+                levelOnDelivery = level - demand;
+            } else if (schema == DeliverySchema.tillEndOfDay) {
+                levelOnDelivery = level - demand + produced;
+            } else if (schema == DeliverySchema.every3hours) {
                 // TODO WTF ?? we need to rewrite that app :/
                 throw new UnsupportedOperationException();
             } else {
@@ -54,13 +43,8 @@ public class Demands {
             return levelOnDelivery;
         }
 
-
         public long calculateEndOfDayLevel(long level, long produced) {
-            return level + produced - getLevel();
-        }
-
-        private boolean hasDeliverySchema(DeliverySchema schema) {
-            return Util.getDeliverySchema(demand) == schema;
+            return level + produced - demand;
         }
     }
 }

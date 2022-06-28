@@ -4,9 +4,10 @@ import dao.DemandDao;
 import entities.DemandEntity;
 import shortages.Demands;
 import shortages.DemandsRepository;
+import tools.Util;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.stream.Collectors;
 
 public class DemandsMediator implements DemandsRepository {
 
@@ -18,8 +19,14 @@ public class DemandsMediator implements DemandsRepository {
 
     @Override
     public Demands getDemands(String productRefNo, LocalDate today) {
-        List<DemandEntity> demands = demandDao.findFrom(today.atStartOfDay(), productRefNo);
-        var demandsPerDay = new Demands(demands);
-        return demandsPerDay;
+        return new Demands(
+                demandDao.findFrom(today.atStartOfDay(), productRefNo).stream()
+                        .collect(Collectors.toUnmodifiableMap(
+                                DemandEntity::getDay,
+                                demand -> new Demands.DailyDemand(
+                                        Util.getLevel(demand),
+                                        Util.getDeliverySchema(demand)
+                                )
+                        )));
     }
 }
