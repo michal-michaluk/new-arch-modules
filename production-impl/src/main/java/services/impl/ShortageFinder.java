@@ -67,7 +67,7 @@ public class ShortageFinder {
                 gap.add(day, levelOnDelivery);
             }
             long endOfDayLevel = level + produced - demand.getLevel();
-            level = endOfDayLevel >= 0 ? endOfDayLevel : 0;
+            level = Math.max(endOfDayLevel, 0);
         }
         return gap.build();
     }
