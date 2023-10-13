@@ -17,7 +17,7 @@ public class ShortagePrediction {
         this.stock = stock;
     }
 
-    public Shortage.Builder predict() {
+    public Shortage predict() {
         long level = stock;
         Shortage.Builder gap = Shortage.builder(productRefNo);
         for (LocalDate day : dates) {
@@ -32,9 +32,9 @@ public class ShortagePrediction {
             if (levelOnDelivery < 0) {
                 gap.add(day, levelOnDelivery);
             }
-            long endOfDayLevel = level + produced - demand.getLevel();
+            long endOfDayLevel = level + produced - demand.getDemand();
             level = Math.max(endOfDayLevel, 0);
         }
-        return gap;
+        return gap.build();
     }
 }

@@ -7,13 +7,23 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Shortage {
+    private final List<ShortageEntity> shortages;
+
+    public Shortage(List<ShortageEntity> shortages) {
+        this.shortages = shortages;
+    }
+
     public static Builder builder(String productRefNo) {
         return new Builder(productRefNo);
     }
 
+    public List<ShortageEntity> toEntities() {
+        return shortages;
+    }
+
     public static class Builder {
         private final String productRefNo;
-        private final List<ShortageEntity> gap = new LinkedList<>();
+        private final List<ShortageEntity> shortages = new LinkedList<>();
 
         public Builder(String productRefNo) {
             this.productRefNo = productRefNo;
@@ -25,11 +35,11 @@ public class Shortage {
             entity.setFound(LocalDate.now());
             entity.setAtDay(day);
             entity.setMissing(Math.abs(levelOnDelivery));
-            gap.add(entity);
+            shortages.add(entity);
         }
 
-        public List<ShortageEntity> build() {
-            return gap;
+        public Shortage build() {
+            return new Shortage(shortages);
         }
     }
 }

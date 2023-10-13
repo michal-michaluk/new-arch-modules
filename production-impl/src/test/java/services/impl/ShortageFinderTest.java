@@ -1,5 +1,8 @@
 package services.impl;
 
+import acl.DemandsACLRepository;
+import acl.ProductionOutputACLRepository;
+import acl.ShortageFinderACL;
 import dao.DemandDao;
 import dao.ProductionDao;
 import entities.*;
@@ -27,7 +30,7 @@ public class ShortageFinderTest {
 
     private final DemandDao demands = Mockito.mock(DemandDao.class);
     private final ProductionDao productions = Mockito.mock(ProductionDao.class);
-    private final ShortageFinder subject = new ShortageFinder(demands, productions);
+    private final ShortageFinderACL subject = new ShortageFinderACL(new DemandsACLRepository(demands), new ProductionOutputACLRepository(productions));
 
     @Test
     public void findShortages() {
