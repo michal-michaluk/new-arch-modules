@@ -53,10 +53,6 @@ public class ShortageFinder {
 
         List<ShortageEntity> gap = new LinkedList<>();
         for (LocalDate day : dates) {
-            if (!demandsPerDay.hasDemandFor(day)) {
-                level += outputs.getOutput(day);
-                continue;
-            }
             long produced = outputs.getOutput(day);
             Demands.DailyDemand demand = demandsPerDay.get(day);
             long levelOnDelivery = demand.calculateLevelOnDelivery(level, produced);

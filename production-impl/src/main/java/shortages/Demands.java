@@ -21,10 +21,6 @@ public class Demands {
         this.demandsPerDay = Collections.unmodifiableMap(demandsPerDay);
     }
 
-    public boolean hasDemandFor(LocalDate day) {
-        return demandsPerDay.containsKey(day);
-    }
-
     public DailyDemand get(LocalDate day) {
         if (demandsPerDay.containsKey(day)) {
             return new DailyDemand(
@@ -32,7 +28,7 @@ public class Demands {
                     Util.getDeliverySchema(demandsPerDay.get(day))
             );
         } else {
-            return null;
+            return new DailyDemand(0, DeliverySchema.tillEndOfDay);
         }
     }
 
