@@ -19,18 +19,10 @@ public class ProductionOutputs {
         this.outputs = Collections.unmodifiableMap(outputs);
     }
 
-    public long getLevel(long level, LocalDate day) {
-        for (ProductionEntity production : outputs.get(day)) {
-            level += production.getOutput();
-        }
-        return level;
-    }
-
-    public long getProduced(LocalDate day) {
-        long produced = 0;
-        for (ProductionEntity production : outputs.get(day)) {
-            produced += production.getOutput();
-        }
-        return produced;
+    public long getOutput(LocalDate day) {
+        return outputs.get(day)
+                .stream()
+                .mapToLong(ProductionEntity::getOutput)
+                .sum();
     }
 }
