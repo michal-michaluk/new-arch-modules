@@ -20,10 +20,6 @@ public class Demands {
 
     public record DailyDemand(long demand, DeliverySchema schema) {
 
-        public long getLevel() {
-            return demand;
-        }
-
         public long calculateLevelOnDelivery(long level, long produced) {
             return switch (schema) {
                 case atDayStart -> level - demand;
@@ -38,6 +34,10 @@ public class Demands {
                     }
                 }
             };
+        }
+
+        public long calculateEndOfDayLevel(long level, long produced) {
+            return level + produced - demand;
         }
     }
 }

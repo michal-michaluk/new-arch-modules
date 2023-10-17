@@ -9,8 +9,20 @@ import java.util.List;
 
 public class Shortages {
 
+    private final String productRefNo;
+    private final List<ShortageEntity> shortages;
+
+    public Shortages(String productRefNo, List<ShortageEntity> shortages) {
+        this.productRefNo = productRefNo;
+        this.shortages = shortages;
+    }
+
     public static Shortages.Builder builder(String productRefNo) {
         return new Builder(productRefNo);
+    }
+
+    public List<ShortageEntity> getEntites() {
+        return shortages;
     }
 
     public static class Builder {
@@ -26,12 +38,15 @@ public class Shortages {
             entity.setRefNo(productRefNo);
             entity.setFound(LocalDate.now());
             entity.setAtDay(day);
-            entity.setMissing(-levelOnDelivery);
+            entity.setMissing(Math.abs(levelOnDelivery));
             shortages.add(entity);
         }
 
-        public List<ShortageEntity> build() {
-            return Collections.unmodifiableList(shortages);
+        public Shortages build() {
+            return new Shortages(
+                    productRefNo,
+                    Collections.unmodifiableList(shortages)
+            );
         }
     }
 }
