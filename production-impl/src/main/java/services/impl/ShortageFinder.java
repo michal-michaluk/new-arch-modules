@@ -2,15 +2,10 @@ package services.impl;
 
 import entities.ShortageEntity;
 import external.CurrentStock;
-import shortages.Demands;
-import shortages.DemandsRepository;
-import shortages.ProductionOutputs;
-import shortages.ProductionOutputsRepository;
+import shortages.*;
 
 import java.time.LocalDate;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class ShortageFinder {
 
@@ -42,33 +37,25 @@ public class ShortageFinder {
      */
     public List<ShortageEntity> findShortages(String productRefNo, LocalDate today, int daysAhead, CurrentStock stock) {
 
-        List<LocalDate> dates = Stream.iterate(today, date -> date.plusDays(1))
-                .limit(daysAhead)
-                .toList();
-
+        DateRange dates = DateRange.of(today, daysAhead);
         ProductionOutputs outputs = productionDao.get(productRefNo, today);
         Demands demandsPerDay = demandDao.get(productRefNo, today);
 
         long level = stock.getLevel();
 
-        List<ShortageEntity> gap = new LinkedList<>();
+        Shortages.Builder shortages = Shortages.builder(productRefNo);
         for (LocalDate day : dates) {
             long produced = outputs.getOutput(day);
             Demands.DailyDemand demand = demandsPerDay.get(day);
             long levelOnDelivery = demand.calculateLevelOnDelivery(level, produced);
 
             if (levelOnDelivery < 0) {
-                ShortageEntity entity = new ShortageEntity();
-                entity.setRefNo(productRefNo);
-                entity.setFound(LocalDate.now());
-                entity.setAtDay(day);
-                entity.setMissing(-levelOnDelivery);
-                gap.add(entity);
+                shortages.add(day, levelOnDelivery);
             }
             long endOfDayLevel = level + produced - demand.getLevel();
-            level = endOfDayLevel >= 0 ? endOfDayLevel : 0;
+            level = Math.max(0, endOfDayLevel);
         }
-        return gap;
+        return shortages.build();
     }
 
 }

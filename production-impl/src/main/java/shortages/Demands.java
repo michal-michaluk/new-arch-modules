@@ -1,35 +1,21 @@
 package shortages;
 
-import entities.DemandEntity;
 import enums.DeliverySchema;
-import tools.Util;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Demands {
-    private final Map<LocalDate, DemandEntity> demandsPerDay;
+    private static final DailyDemand NO_DEMAND = new DailyDemand(0, DeliverySchema.tillEndOfDay);
 
-    public Demands(List<DemandEntity> demands) {
-        Map<LocalDate, DemandEntity> demandsPerDay = new HashMap<>();
-        for (DemandEntity demand : demands) {
-            demandsPerDay.put(demand.getDay(), demand);
-        }
-        this.demandsPerDay = Collections.unmodifiableMap(demandsPerDay);
+    private final Map<LocalDate, DailyDemand> demands;
+
+    public Demands(Map<LocalDate, DailyDemand> demands) {
+        this.demands = demands;
     }
 
     public DailyDemand get(LocalDate day) {
-        if (demandsPerDay.containsKey(day)) {
-            return new DailyDemand(
-                    Util.getLevel(demandsPerDay.get(day)),
-                    Util.getDeliverySchema(demandsPerDay.get(day))
-            );
-        } else {
-            return new DailyDemand(0, DeliverySchema.tillEndOfDay);
-        }
+        return demands.getOrDefault(day, NO_DEMAND);
     }
 
     public record DailyDemand(long demand, DeliverySchema schema) {
