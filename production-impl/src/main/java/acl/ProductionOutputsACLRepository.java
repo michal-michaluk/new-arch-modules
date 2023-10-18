@@ -11,13 +11,14 @@ import java.util.Map;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.summingLong;
 
-public class ProductionOutputsACLRepository {
+public class ProductionOutputsACLRepository implements shortages.ProductionOutputsRepository {
     private final ProductionDao productionDao;
 
     public ProductionOutputsACLRepository(ProductionDao productionDao) {
         this.productionDao = productionDao;
     }
 
+    @Override
     public ProductionOutputs get(String productRefNo, LocalDate start) {
         List<ProductionEntity> productions = productionDao.findFromTime(productRefNo, start.atStartOfDay());
         Map<LocalDate, Long> grouped = productions.stream().collect(groupingBy(

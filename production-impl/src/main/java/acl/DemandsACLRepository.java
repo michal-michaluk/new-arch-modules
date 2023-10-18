@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DemandsACLRepository {
+public class DemandsACLRepository implements shortages.DemandsRepository {
     private final DemandDao demandDao;
 
     public DemandsACLRepository(DemandDao demandDao) {
@@ -17,6 +17,7 @@ public class DemandsACLRepository {
     }
 
 
+    @Override
     public Demands get(String productRefNo, LocalDate start) {
         List<DemandEntity> demands = demandDao.findFrom(start.atStartOfDay(), productRefNo);
         var grouped = demands.stream()
